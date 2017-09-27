@@ -45,22 +45,37 @@ public class MyAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-        linearLayout = (LinearLayout)layoutInflater.inflate(R.layout.cell,null);
-        TextView contexttv = (TextView)linearLayout.findViewById(R.id.list_content);
-        TextView timeTv = (TextView)linearLayout.findViewById(R.id.list_time);
-        ImageView iv_img = (ImageView)linearLayout.findViewById(R.id.list_img);
-        ImageView iv_video  = (ImageView)linearLayout.findViewById(R.id.list_video);
+        ViewHolder holder;
+
+        if(view == null){
+            holder = new ViewHolder();
+            LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+            view = layoutInflater.inflate(R.layout.cell,null);
+            holder.contexttv = view.findViewById(R.id.list_content);
+            holder.timeTv = view.findViewById(R.id.list_time);
+            holder.iv_img = view.findViewById(R.id.list_img);
+            holder.iv_video = view.findViewById(R.id.list_video);
+            view.setTag(holder);
+        }else {
+            holder = (ViewHolder)view.getTag();
+        }
         mCursor.moveToPosition(i);
         String context = mCursor.getString(mCursor.getColumnIndex(NotesDB.CONTENT));
         String time = mCursor.getString(mCursor.getColumnIndex(NotesDB.TIME));
         String url = mCursor.getString(mCursor.getColumnIndex(NotesDB.PATH));
         String video = mCursor.getString(mCursor.getColumnIndex(NotesDB.VIDEO));
-        contexttv.setText(context);
-        timeTv.setText(time);
-        iv_video.setImageBitmap(getVideoThumbnail(video,200,200, MediaStore.Images.Thumbnails.MICRO_KIND));
-        iv_img.setImageBitmap(getImageThumbnail(url,200,200));
+        holder.contexttv.setText(context);
+        holder.timeTv.setText(time);
+        holder.iv_video.setImageBitmap(getVideoThumbnail(video,200,200, MediaStore.Images.Thumbnails.MICRO_KIND));
+        holder.iv_img.setImageBitmap(getImageThumbnail(url,200,200));
         return linearLayout;
+    }
+
+    private class ViewHolder{
+        private TextView contexttv;
+        private TextView timeTv;
+        private ImageView iv_img;
+        private ImageView iv_video;
     }
 
     public Bitmap getImageThumbnail(String uri,int width,int height){
@@ -86,6 +101,8 @@ public class MyAdapter extends BaseAdapter {
                 ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
         return bitmap;
     }
+
+
 
     private Bitmap getVideoThumbnail(String uri,int width,int height,int kind){
         Bitmap bitmap = null;
